@@ -3,7 +3,7 @@
 
 (def db {:classname "com.mysql.jdbc.Driver"
           :subprotocol "mysql"
-          :subname "//127.0.0.1:8889/admin"
+          :subname "//127.0.0.1:3306/admin"
           :user "root"
           :password "root"})
 
