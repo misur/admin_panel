@@ -26,8 +26,8 @@
 
 (defn get-user-by-username-and-password
   "GET user by username and password"
-  [username password]
-  {:body (my-db/get-user-by-username-and-password username password)
+  [params]
+  {:body    (my-db/get-user-by-username-and-password (-> params :username) (-> params :password))
    :status 200
    :headers {"Content-Type" "application/json"}})
 
@@ -56,10 +56,9 @@
    :headers {"Content-Type" "application/json"}})
 
 (defroutes app-routes
-  (GET "/" [] "Hello World by misur")
   (GET "/users/all" [] (get-all-users))
   (GET "/users/:id" [id] (get-user-by-id id))
-  (GET "/users" [username password] (get-user-by-username-and-password username password))
+  (GET "/users" {params :params} (get-user-by-username-and-password params))
   (DELETE "/users/:id" [id] (delete-user-by-id id))
   (POST "/users" req  (insert-new-user req))
   (PUT "/users/:id" req (update-user req))
@@ -80,12 +79,5 @@
 (.start server)
 
 
-
-;;----------------------------test--------------------------------------
-
-
-(app-routes {:uri "/users/3" :request-method :get})
-(app-routes {:uri "/users/3"  :request-method :put :params
-             {:username "test" :password "test" :type 1 :email "new@gmail.com"}})
 
 
