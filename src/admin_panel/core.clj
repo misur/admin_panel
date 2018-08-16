@@ -1,6 +1,7 @@
 (ns admin-panel.core
   (:require [clojure.java.jdbc :as sql]
             [admin_panel.users_db :as my-db]
+            [admin-panel.users_controller :as users_ctrl]
             [ring.adapter.jetty :as jetty]
             [clojure.java.io :as io]
             [compojure.core :as compojure :refer (GET POST ANY DELETE PUT defroutes)]
@@ -10,58 +11,13 @@
                        [route :as route])))
 
 
-(defn get-all-users
-  "GET all users"
-  []
-  {:body (my-db/get-all-users)
-   :status 200
-   :headers {"Content-Type" "application/json"}})
-
-(defn get-user-by-id
-  "GET user by id"
-  [id]
-  {:body (my-db/get-user-by-id id)
-   :status 200
-   :headers {"Content-Type" "application/json"}})
-
-(defn get-user-by-username-and-password
-  "GET user by username and password"
-  [params]
-  {:body    (my-db/get-user-by-username-and-password (-> params :username) (-> params :password))
-   :status 200
-   :headers {"Content-Type" "application/json"}})
-
-(defn  delete-user-by-id
-  "DELETE user by id"
-  [id]
-  {:body (my-db/remove-user-by-id id)
-   :status 200
-   :headers {"Content-Type" "application/json"}})
-
-(defn insert-new-user
-  "POST insert new user"
-  [req]
-  {:body (my-db/insert-new-user (-> req :params :username) (-> req :params :password) (-> req :params :type) (-> req :params :email))
-   :status 200
-   :headers {"Content-Type" "application/json"}})
-
-(defn update-user
-  "PUT update user"
-  [req]
-  {:body (my-db/update-user-by-id (-> req :route-params :id) {:username (-> req :params :username)
-                                   :password (-> req :params :password)
-                                   :type (-> req :params :type)
-                                   :email (-> req :params :email)})
-   :status 200
-   :headers {"Content-Type" "application/json"}})
-
 (defroutes app-routes
-  (GET "/users/all" [] (get-all-users))
-  (GET "/users/:id" [id] (get-user-by-id id))
-  (GET "/users" {params :params} (get-user-by-username-and-password params))
-  (DELETE "/users/:id" [id] (delete-user-by-id id))
-  (POST "/users" req  (insert-new-user req))
-  (PUT "/users/:id" req (update-user req))
+  (GET "/users/all" [] (users_ctrl/get-all-users))
+  (GET "/users/:id" [id] (users_ctrl/get-user-by-id id))
+  (GET "/users" {params :params} (users_ctrl/get-user-by-username-and-password params))
+  (DELETE "/users/:id" [id] (users_ctrl/delete-user-by-id id))
+  (POST "/users" req  (users_ctrl/insert-new-user (-> req :params)))
+  (PUT "/users/:id" req (users_ctrl/update-user (-> req :route-params :id) (-> req :params)))
   (route/resources "/")
   (route/not-found "Not Found"))
 
