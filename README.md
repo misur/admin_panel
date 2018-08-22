@@ -1,6 +1,6 @@
 # admin-panel
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure RESTful project, which contains  base functionality  to mange users.
 
 ## Usage
 

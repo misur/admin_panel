@@ -7,6 +7,7 @@
             [compojure.core :as compojure :refer (GET POST ANY DELETE PUT defroutes)]
             [ring.middleware.json :refer [wrap-json-response]]
             [ring.middleware.params :refer [wrap-params]]
+            [ring.middleware.cookies :refer [wrap-cookies]]
             (compojure [handler :as handler]
                        [route :as route])))
 
@@ -21,10 +22,21 @@
   (route/resources "/")
   (route/not-found "Not Found"))
 
+
+
+(defn wrap-spy [handler spyname include-body]
+  (fn [request]
+    (println  request )
+    (let [response (handler request)]
+        response)))
+
 (def app
   (handler/site
-      (wrap-json-response app-routes)
-      (wrap-params app-routes)))
+    (-> app-routes
+        (wrap-cookies )
+        (wrap-spy "what the handler sees" true)
+        (wrap-json-response )
+        (wrap-params))))
 
 (defn -main []
   (jetty/run-jetty app {:port 3000}))
